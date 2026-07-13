@@ -9,5 +9,5 @@
 //  ※ service_role 키는 절대 넣지 마세요!
 // ============================================================
 
-const SUPABASE_URL = 'https://여기에-프로젝트-URL.supabase.co';
-const SUPABASE_ANON_KEY = '여기에-anon-public-key';
+const SUPABASE_URL = 'https://whecdbxwmtlxdiepfpvp.supabase.co/rest/v1/';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoZWNkYnh3bXRseGRpZXBmcHZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5NDA1ODAsImV4cCI6MjA5OTUxNjU4MH0.tNcDf4AW9qRVGzP4XIpMS94DVYxKcTxcugZ80ui9oO4';
