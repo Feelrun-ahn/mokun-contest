@@ -1,7 +1,10 @@
 /* ===== 공통 스크립트 (Supabase 연동) ===== */
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// 주소 끝의 슬래시나 앞뒤 공백이 있어도 자동으로 정리합니다 (흔한 실수 방지)
+const _URL = String(SUPABASE_URL).trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, '');
+const _KEY = String(SUPABASE_ANON_KEY).trim();
+const sb = window.supabase.createClient(_URL, _KEY);
 
-const SETUP_NEEDED = SUPABASE_URL.includes('여기에');
+const SETUP_NEEDED = _URL.includes('여기에');
 if (SETUP_NEEDED) {
   document.addEventListener('DOMContentLoaded', () => {
     document.body.insertAdjacentHTML('afterbegin',
