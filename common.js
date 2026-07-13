@@ -44,8 +44,11 @@ const DB = {
     if (error) throw new Error(cleanErr(error.message));
     return data;
   },
-  async inquire(name, email, question) {
-    const { error } = await sb.from('inquiries').insert({ name, email, question });
+  async inquire(name, phone, question) {
+    if (!/^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(String(phone).replace(/\s/g, ''))) {
+      throw new Error('연락처 형식을 확인해 주세요. (예: 010-1234-5678)');
+    }
+    const { error } = await sb.from('inquiries').insert({ name, phone, question });
     if (error) throw new Error('문의 등록에 실패했습니다.');
   },
   /* 작품 제출: ① 파일을 저장소에 업로드 → ② 접수 함수 호출 */
@@ -121,19 +124,19 @@ function esc(s) {
 
 function renderHeader(active) {
   const links = [
-    ['index.html', '공모전 소개'], ['notice.html', '공지사항'], ['submit.html', '작품 제출'],
+    ['index.html#about', '공모전 소개'], ['notice.html', '공지사항'], ['submit.html', '작품 제출'],
     ['results.html', '결과 발표'], ['faq.html', 'FAQ · 문의'], ['lookup.html', '접수 조회']
   ];
   return `
   <header class="header">
     <div class="wrap">
       <a href="index.html" class="logo">
-        <span class="logo-mark">목운</span>
-        <span>교복 디자인 공모전<small>목운중학교 학생회</small></span>
+        <img class="logo-mark" src="mogun-logo.png" alt="목운중학교 로고">
+        <span>교복 디자인 공모전<small>목운중학교 학생회 · Mogun Middle School</small></span>
       </a>
       <button class="burger" aria-label="메뉴" onclick="document.querySelector('.nav').classList.toggle('open')">☰</button>
       <nav class="nav">
-        ${links.map(([h, t]) => `<a href="${h}" class="${active === h ? 'active' : ''}">${t}</a>`).join('')}
+        ${links.map(([h, t]) => `<a href="${h}" class="${h.split('#')[0] === active ? 'active' : ''}">${t}</a>`).join('')}
         <a href="notice.html" class="btn btn-primary btn-sm">참가하기</a>
       </nav>
     </div>
@@ -144,7 +147,7 @@ function renderFooter() {
   <footer class="footer">
     <div class="wrap">
       <div>
-        <b>목운중학교 학생회</b>
+        <b>목운중학교 학생회 <span class="en">Mogun Middle School</span></b>
         교복 디자인 공모전 운영 · 서울특별시 양천구<br>
         문의: 학생회실 (점심시간) 또는 FAQ 페이지의 문의하기
       </div>
@@ -156,6 +159,10 @@ function renderFooter() {
           <a href="admin.html">학생회 관리자</a>
         </div>
       </div>
+    </div>
+    <div class="wrap credit">
+      <span>만든이 · 전교회장 <b>안태현</b></span>
+      <span>ⓒ 2026 Mogun Middle School Student Council</span>
     </div>
   </footer>`;
 }
