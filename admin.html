@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="mokun-logo.svg">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>학생회 관리자 · 목운중 교복 디자인 공모전</title>
+<style>
+  .admin-top{background:var(--ink-900);color:#fff;position:sticky;top:0;z-index:60}
+  .admin-top .wrap{display:flex;align-items:center;gap:14px;height:60px}
+  .admin-top .logo-mark{background:var(--blue-600)}
+  .admin-top b{font-size:15px}
+  .admin-top .sp{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .bell{position:relative;background:rgba(255,255,255,.1);border:0;color:#fff;width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:16px}
+  .bell .cnt{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto;background:#fff;position:sticky;top:60px;z-index:55}
+  .tabs button{background:none;border:0;padding:15px 18px;font-weight:700;font-size:14.5px;color:var(--ink-500);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+  .tabs button.on{color:var(--blue-600);border-bottom-color:var(--blue-600)}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+  .stat .v{font-size:28px;font-weight:800;color:var(--blue-700);line-height:1.2}
+  .stat .l{font-size:13px;color:var(--ink-500);font-weight:700}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:#fff;box-shadow:-10px 0 40px rgba(15,23,42,.2);z-index:120;transform:translateX(100%);transition:.25s;overflow-y:auto;padding:24px}
+  .drawer.open{transform:none}
+  .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:110;opacity:0;pointer-events:none;transition:.2s}
+  .backdrop.on{opacity:1;pointer-events:auto}
+  .nlist{display:grid;gap:8px}
+  .nitem{padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+  .nitem.unread{border-color:var(--blue-100);background:var(--blue-50)}
+  .nitem .tm{font-size:12px;color:var(--ink-400);margin-top:3px}
+  .thumbs{display:flex;gap:8px;flex-wrap:wrap}
+  .thumbs a{width:74px;height:74px;border-radius:8px;overflow:hidden;border:1px solid var(--line);display:grid;place-items:center;background:var(--bg);font-size:11px;font-weight:800;color:var(--blue-600)}
+  .thumbs img{width:100%;height:100%;object-fit:cover}
+  @media(max-width:960px){.grid-4{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body style="background:var(--bg)">
+
+<section id="login" style="min-height:100vh;display:grid;place-items:center;padding:24px">
+  <form class="card" id="loginForm" style="width:100%;max-width:400px">
+    <div class="center" style="margin-bottom:22px">
+      <div style="width:48px;height:48px;border-radius:12px;margin:0 auto 12px;font-size:16px;background:linear-gradient(135deg,var(--blue-600),var(--blue-900));color:#fff;display:grid;place-items:center;font-weight:800">목운</div>
+      <h1 style="font-size:20px;font-weight:800">학생회 관리자</h1>
+      <p class="muted" style="font-size:14px">교복 디자인 공모전 관리 시스템</p>
+    </div>
+    <div class="field"><label>이메일</label><input class="input" name="email" type="email" required autocomplete="username"></div>
+    <div class="field"><label>비밀번호</label><input class="input" name="password" type="password" required autocomplete="current-password"></div>
+    <button class="btn btn-primary btn-block btn-lg">로그인</button>
+    <p class="center muted mt-16" style="font-size:12.5px">Supabase에 등록된 학생회 계정만 로그인할 수 있습니다.</p>
+    <p class="center mt-8"><a href="index.html" style="font-size:13px;color:var(--blue-600);font-weight:700">← 공모전 홈으로</a></p>
+  </form>
+</section>
+
+<div id="app" class="hide">
+  <div class="admin-top">
+    <div class="wrap">
+      <span class="logo-mark">목운</span>
+      <b>학생회 관리자</b>
+      <span class="sp">
+        <button class="bell" id="bell">🔔<span class="cnt hide" id="bellCnt">0</span></button>
+        <span style="font-size:13.5px;color:#94a3b8" id="who"></span>
+        <button class="btn btn-sm btn-line" id="logout">로그아웃</button>
+      </span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="wrap" style="display:flex;gap:2px">
+      <button data-t="dash" class="on">대시보드</button>
+      <button data-t="submissions">제출 작품</button>
+      <button data-t="contest">공모전 설정</button>
+      <button data-t="notice">공지사항 편집</button>
+      <button data-t="faq">FAQ 관리</button>
+      <button data-t="inquiries">문의 관리</button>
+    </div>
+  </div>
+
+  <main class="wrap" style="padding-top:26px;padding-bottom:60px">
+    <section id="p-dash">
+      <div class="grid-4" style="margin-bottom:22px">
+        <div class="stat"><div class="v" id="sTotal">0</div><div class="l">총 접수 작품</div></div>
+        <div class="stat"><div class="v" id="sToday">0</div><div class="l">오늘 접수</div></div>
+        <div class="stat"><div class="v" id="sAward">0</div><div class="l">수상 지정</div></div>
+        <div class="stat"><div class="v" id="sInq">0</div><div class="l">미답변 문의</div></div>
+      </div>
+      <div class="card" style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="muted" style="font-size:13px;font-weight:700">현재 공모전</div>
+            <b id="dTitle" style="font-size:18px">-</b>
+            <div class="muted mt-8" style="font-size:13.5px" id="dPeriod"></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="dStatus"></span>
+            <button class="btn btn-sm btn-line" id="csvBtn">참가자 명단 CSV</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <b style="font-size:16px">최근 접수</b>
+        <div class="nlist mt-16" id="dRecent"></div>
+      </div>
+    </section>
+
+    <section id="p-submissions" class="hide">
+      <div class="card" style="margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input class="input" id="q" placeholder="이름 · 학번 · 작품명 · 접수번호 검색" style="max-width:320px">
+        <button class="btn btn-line btn-sm" id="qBtn">검색</button>
+        <button class="btn btn-line btn-sm" id="csvBtn2">CSV 내려받기</button>
+        <span class="muted" style="margin-left:auto;font-size:13.5px" id="subCount"></span>
+      </div>
+      <div class="card" style="padding:0;overflow-x:auto">
+        <table class="tbl" id="subTbl"></table>
+      </div>
+    </section>
+
+    <section id="p-contest" class="hide">
+      <form class="card" id="cForm" style="max-width:760px">
+        <h2 style="font-size:18px;margin-bottom:16px">공모전 정보</h2>
+        <div class="field"><label>제목</label><input class="input" name="title"></div>
+        <div class="field"><label>부제</label><input class="input" name="subtitle"></div>
+        <div class="field"><label>소개</label><textarea class="textarea" name="summary"></textarea></div>
+        <div class="field"><label>참가 대상</label><input class="input" name="target"></div>
+        <div class="grid-2">
+          <div class="field"><label>접수 시작</label><input class="input" name="start_at" type="datetime-local"></div>
+          <div class="field"><label>접수 마감</label><input class="input" name="end_at" type="datetime-local"></div>
+          <div class="field"><label>심사 종료</label><input class="input" name="judge_until" type="datetime-local"></div>
+          <div class="field"><label>결과 발표</label><input class="input" name="result_at" type="datetime-local"></div>
+        </div>
+        <div class="field">
+          <label>진행 상태</label>
+          <select class="input" name="status">
+            <option value="open">접수 중</option>
+            <option value="judging">심사 중</option>
+            <option value="announced">결과 발표</option>
+            <option value="closed">마감 (종료)</option>
+          </select>
+          <div class="hint">'마감'으로 바꾸면 참가자는 더 이상 작품을 제출할 수 없습니다.</div>
+        </div>
+        <div class="field">
+          <label>시상 내역</label>
+          <div id="prizeRows" class="mt-8"></div>
+          <button type="button" class="btn btn-line btn-sm mt-8" id="addPrize">+ 시상 추가</button>
+        </div>
+        <button class="btn btn-primary">공모전 정보 저장</button>
+      </form>
+    </section>
+
+    <section id="p-notice" class="hide">
+      <div class="card" style="max-width:900px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:10px">
+          <h2 style="font-size:18px">공지사항 편집</h2>
+          <button class="btn btn-primary btn-sm" id="saveNotice">공지 저장</button>
+        </div>
+        <p class="muted" style="font-size:13.5px;margin-bottom:18px">각 항목은 한 줄에 하나씩 입력하세요. 저장하면 참가자 공지 페이지에 바로 반영됩니다.</p>
+        <div id="noticeEdit"></div>
+        <button class="btn btn-line btn-sm mt-16" id="addSec">+ 항목(섹션) 추가</button>
+      </div>
+    </section>
+
+    <section id="p-faq" class="hide">
+      <div class="card" style="max-width:820px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h2 style="font-size:18px">FAQ 관리</h2>
+          <button class="btn btn-line btn-sm" id="addFaq">+ 질문 추가</button>
+        </div>
+        <div id="faqEdit"></div>
+      </div>
+    </section>
+
+    <section id="p-inquiries" class="hide">
+      <div class="card" style="max-width:900px">
+        <h2 style="font-size:18px;margin-bottom:16px">문의 관리</h2>
+        <div id="inqList"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="backdrop" id="bd"></div>
+<aside class="drawer" id="drawer"></aside>
+
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+
+let ME = null, CONTEST = null, SUBS = [], NOTICE = null, INQ = [];
+const SEEN_KEY = 'mokun_admin_seen';
+
+/* ---------- 로그인 ---------- */
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target;
+  const { error } = await sb.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value });
+  if (error) return toast('이메일 또는 비밀번호가 올바르지 않습니다.', true);
+  boot();
+});
+document.getElementById('logout').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  location.reload();
+});
+
+(async function init() {
+  const { data } = await sb.auth.getSession();
+  if (data.session) boot();
+})();
+
+async function boot() {
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+
+  // 관리자 명단(admins)에 있는 계정만 통과
+  const { data: adm } = await sb.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+  if (!adm) {
+    await sb.auth.signOut();
+    toast('관리자 권한이 없는 계정입니다. 학생회 담당자에게 문의하세요.', true);
+    return;
+  }
+
+  ME = user.email;
+  document.getElementById('login').classList.add('hide');
+  document.getElementById('app').classList.remove('hide');
+  document.getElementById('who').textContent = ME;
+  await loadAll();
+  if (location.hash) show(location.hash.slice(1));
+}
+
+async function loadAll() {
+  CONTEST = await DB.contest();
+  await loadSubs();
+  await loadInquiries();
+  await loadFaqs();
+  renderDash();
+  if (CONTEST) { fillContestForm(); renderNoticeEdit(CONTEST.notice || { sections: [] }); }
+}
+
+/* ---------- 탭 ---------- */
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => show(b.dataset.t)));
+function show(t) {
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  ['dash', 'submissions', 'contest', 'notice', 'faq', 'inquiries'].forEach(k =>
+    document.getElementById('p-' + k).classList.toggle('hide', k !== t));
+}
+
+/* ---------- 제출 작품 ---------- */
+async function loadSubs(q) {
+  let query = sb.from('submissions').select('*').order('created_at', { ascending: false });
+  if (CONTEST) query = query.eq('contest_id', CONTEST.id);
+  const { data, error } = await query;
+  if (error) { toast('작품을 불러오지 못했습니다.', true); return; }
+  SUBS = data || [];
+  let list = SUBS;
+  if (q) {
+    const kw = q.toLowerCase();
+    list = SUBS.filter(s => (s.name + s.student_id + s.title + s.receipt_no).toLowerCase().includes(kw));
+  }
+  document.getElementById('subCount').textContent = `총 ${list.length}건`;
+  document.getElementById('subTbl').innerHTML = list.length ? `
+    <tr><th>접수번호</th><th>이름</th><th>학번</th><th>작품명</th><th>파일</th><th>상태</th><th>접수일시</th><th></th></tr>
+    ${list.map(s => `
+      <tr>
+        <td><b>${esc(s.receipt_no)}</b></td>
+        <td>${esc(s.name)}</td><td>${esc(s.student_id)}</td><td>${esc(s.title)}</td>
+        <td>${(s.files || []).length}개</td>
+        <td>${s.award ? '🏆 ' + esc(s.award.rank) : (SUB_STATUS[s.status] || s.status)}</td>
+        <td class="muted">${fmtDate(s.created_at, true)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-sm btn-ghost" onclick="openSub('${s.id}')">상세</button>
+          <button class="btn btn-sm btn-danger" onclick="delSub('${s.id}')">삭제</button>
+        </td>
+      </tr>`).join('')}` : '<tr><td><div class="empty">제출된 작품이 없습니다.</div></td></tr>';
+}
+document.getElementById('qBtn').addEventListener('click', () => loadSubs(document.getElementById('q').value.trim()));
+document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') loadSubs(e.target.value.trim()); });
+
+/* 파일 미리보기·다운로드용 임시 링크 (관리자만 발급 가능) */
+async function signedUrl(path, download) {
+  const opt = download ? { download } : undefined;
+  const { data, error } = await sb.storage.from('submissions').createSignedUrl(path, 300, opt);
+  if (error) { toast('파일 링크를 만들지 못했습니다.', true); return null; }
+  return data.signedUrl;
+}
+
+async function openSub(id) {
+  const s = SUBS.find(x => x.id === id);
+  if (!s) return;
+  const files = s.files || [];
+  const urls = await Promise.all(files.map(f => signedUrl(f.path)));
+
+  openDrawer(`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="font-size:20px">${esc(s.receipt_no)}</h2>
+      <button class="btn btn-sm btn-line" onclick="closeDrawer()">닫기</button>
+    </div>
+    <table class="tbl" style="margin-bottom:18px">
+      <tr><th style="width:90px">이름</th><td>${esc(s.name)}</td></tr>
+      <tr><th>학번</th><td>${esc(s.student_id)}</td></tr>
+      <tr><th>연락처</th><td>${esc(s.phone)}</td></tr>
+      <tr><th>이메일</th><td>${esc(s.email) || '-'}</td></tr>
+      <tr><th>작품명</th><td>${esc(s.title)}</td></tr>
+      <tr><th>설명</th><td>${esc(s.concept) || '-'}</td></tr>
+      <tr><th>접수일시</th><td>${fmtDate(s.created_at, true)}</td></tr>
+    </table>
+
+    <b style="font-size:15px">제출 파일 (${files.length})</b>
+    <div class="thumbs mt-8" style="margin-bottom:10px">
+      ${files.map((f, i) => urls[i]
+        ? (String(f.mime).startsWith('image/')
+          ? `<a href="${urls[i]}" target="_blank"><img src="${urls[i]}"></a>`
+          : `<a href="${urls[i]}" target="_blank">${(f.name.split('.').pop() || 'FILE').toUpperCase()}</a>`)
+        : '').join('')}
+    </div>
+    <div style="display:grid;gap:6px;margin-bottom:18px">
+      ${files.map((f, i) => `<div class="fileitem">
+        <span class="fi-ic">${(f.name.split('.').pop() || '').toUpperCase().slice(0, 4)}</span>
+        <span class="fi-name">${esc(f.name)}</span>
+        <span class="fi-size">${fmtSize(f.size)}</span>
+        <button class="btn btn-sm btn-line" onclick="dl('${f.path}','${esc(s.receipt_no)}_${esc(f.name)}')">다운로드</button>
+      </div>`).join('')}
+    </div>
+
+    <div class="field"><label>심사 상태</label>
+      <select class="input" id="dStatusSel">
+        ${Object.entries(SUB_STATUS).map(([k, v]) => `<option value="${k}" ${s.status === k ? 'selected' : ''}>${v}</option>`).join('')}
+      </select></div>
+    <div class="field"><label>수상 (비워두면 수상 취소)</label>
+      <input class="input" id="dAward" placeholder="예: 대상 / 최우수상 / 우수상" value="${s.award ? esc(s.award.rank) : ''}">
+      <div class="hint">수상으로 지정하면 첫 번째 이미지가 결과 발표 갤러리에 공개됩니다.</div></div>
+    <div class="field"><label>심사 메모 (내부용)</label>
+      <textarea class="textarea" id="dMemo">${esc(s.memo)}</textarea></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" id="saveSubBtn">저장</button>
+      <button class="btn btn-danger" onclick="delSub('${s.id}')">작품 삭제</button>
+    </div>`);
+
+  document.getElementById('saveSubBtn').addEventListener('click', () => saveSub(id));
+}
+
+async function dl(path, filename) {
+  const url = await signedUrl(path, filename);
+  if (url) window.location.href = url;
+}
+
+async function saveSub(id) {
+  const s = SUBS.find(x => x.id === id);
+  const rank = document.getElementById('dAward').value.trim();
+  const btn = document.getElementById('saveSubBtn');
+  btn.disabled = true; btn.textContent = '저장 중…';
+
+  let award = null;
+  if (rank) {
+    const order = ['대상', '최우수상', '우수상', '입선'].indexOf(rank);
+    let image = s.award && s.award.image ? s.award.image : null;
+    // 수상작 대표 이미지를 공개 저장소(winners)로 복사
+    const first = (s.files || []).find(f => String(f.mime).startsWith('image/'));
+    if (first && !image) {
+      try {
+        const { data: blob } = await sb.storage.from('submissions').download(first.path);
+        if (blob) {
+          const ext = (first.name.split('.').pop() || 'png').toLowerCase();
+          const wpath = `${s.id}.${ext}`;
+          await sb.storage.from('winners').upload(wpath, blob, { contentType: first.mime, upsert: true });
+          image = wpath;
+        }
+      } catch (e) { console.warn('수상작 이미지 공개 실패', e); }
+    }
+    award = { rank, order: order === -1 ? 9 : order, image };
+  } else if (s.award && s.award.image) {
+    await sb.storage.from('winners').remove([s.award.image]).catch(() => {});
+  }
+
+  const { error } = await sb.from('submissions').update({
+    status: award ? 'awarded' : document.getElementById('dStatusSel').value,
+    memo: document.getElementById('dMemo').value,
+    award
+  }).eq('id', id);
+
+  if (error) { toast('저장에 실패했습니다.', true); btn.disabled = false; btn.textContent = '저장'; return; }
+  toast('저장했습니다.');
+  closeDrawer();
+  await loadSubs(); renderDash();
+}
+
+async function delSub(id) {
+  const s = SUBS.find(x => x.id === id);
+  if (!s) return;
+  if (!confirm(`${s.receipt_no} 작품을 삭제할까요?\n업로드된 파일도 함께 삭제되며 되돌릴 수 없습니다.`)) return;
+  const paths = (s.files || []).map(f => f.path);
+  if (paths.length) await sb.storage.from('submissions').remove(paths);
+  if (s.award && s.award.image) await sb.storage.from('winners').remove([s.award.image]);
+  const { error } = await sb.from('submissions').delete().eq('id', id);
+  if (error) return toast('삭제에 실패했습니다.', true);
+  toast('삭제했습니다.');
+  closeDrawer();
+  await loadSubs(); renderDash();
+}
+
+/* ---------- 대시보드 ---------- */
+function renderDash() {
+  const today = new Date().toDateString();
+  document.getElementById('sTotal').textContent = SUBS.length;
+  document.getElementById('sToday').textContent = SUBS.filter(s => new Date(s.created_at).toDateString() === today).length;
+  document.getElementById('sAward').textContent = SUBS.filter(s => s.award).length;
+  document.getElementById('sInq').textContent = INQ.filter(i => !i.answer).length;
+
+  if (CONTEST) {
+    document.getElementById('dTitle').textContent = CONTEST.title;
+    document.getElementById('dPeriod').textContent =
+      `${fmtDate(CONTEST.start_at)} ~ ${fmtDate(CONTEST.end_at)} · 결과 발표 ${fmtDate(CONTEST.result_at)}`;
+    document.getElementById('dStatus').innerHTML = statusBadge(CONTEST.status);
+  }
+
+  const seen = Number(localStorage.getItem(SEEN_KEY) || 0);
+  const fresh = SUBS.filter(s => new Date(s.created_at).getTime() > seen);
+  const bc = document.getElementById('bellCnt');
+  bc.textContent = fresh.length;
+  bc.classList.toggle('hide', !fresh.length);
+
+  document.getElementById('dRecent').innerHTML = SUBS.length
+    ? SUBS.slice(0, 8).map(s => `
+      <div class="nitem ${new Date(s.created_at).getTime() > seen ? 'unread' : ''}">
+        <b>${esc(s.receipt_no)}</b> · ${esc(s.name)}(${esc(s.student_id)}) · ${esc(s.title)}
+        <div class="tm">${fmtDate(s.created_at, true)}</div>
+      </div>`).join('')
+    : '<div class="empty" style="padding:24px">아직 접수된 작품이 없습니다.</div>';
+}
+
+document.getElementById('bell').addEventListener('click', () => {
+  const seen = Number(localStorage.getItem(SEEN_KEY) || 0);
+  const fresh = SUBS.filter(s => new Date(s.created_at).getTime() > seen);
+  openDrawer(`<h2 style="font-size:19px;margin-bottom:14px">새 제출 알림 ${fresh.length}건</h2>
+    <div class="nlist">${fresh.length ? fresh.map(s => `
+      <div class="nitem unread"><b>${esc(s.receipt_no)}</b> · ${esc(s.name)}(${esc(s.student_id)})<br>${esc(s.title)}
+        <div class="tm">${fmtDate(s.created_at, true)}</div></div>`).join('')
+      : '<div class="empty">마지막 확인 이후 새로 접수된 작품이 없습니다.</div>'}</div>`);
+  localStorage.setItem(SEEN_KEY, Date.now());
+  document.getElementById('bellCnt').classList.add('hide');
+  renderDash();
+});
+
+/* ---------- CSV ---------- */
+function exportCsv() {
+  const rows = [['접수번호', '이름', '학번', '연락처', '이메일', '작품명', '설명', '파일수', '상태', '수상', '접수일시']];
+  SUBS.forEach(s => rows.push([s.receipt_no, s.name, s.student_id, s.phone, s.email, s.title, s.concept,
+    (s.files || []).length, SUB_STATUS[s.status] || s.status, s.award ? s.award.rank : '', fmtDate(s.created_at, true)]));
+  const csv = '﻿' + rows.map(r => r.map(v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'mokun_participants.csv';
+  a.click();
+}
+document.getElementById('csvBtn').addEventListener('click', exportCsv);
+document.getElementById('csvBtn2').addEventListener('click', exportCsv);
+
+/* ---------- 공모전 설정 ---------- */
+const toLocal = iso => iso ? new Date(new Date(iso).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '';
+function fillContestForm() {
+  const f = document.getElementById('cForm');
+  ['title', 'subtitle', 'summary', 'target', 'status'].forEach(k => f.elements[k].value = CONTEST[k] || '');
+  ['start_at', 'end_at', 'judge_until', 'result_at'].forEach(k => f.elements[k].value = toLocal(CONTEST[k]));
+  renderPrizes(CONTEST.prizes || []);
+}
+function renderPrizes(list) {
+  document.getElementById('prizeRows').innerHTML = list.map(p => `
+    <div style="display:flex;gap:6px;margin-bottom:6px" data-p>
+      <input class="input" style="max-width:120px" value="${esc(p.rank)}" data-k="rank" placeholder="상 이름">
+      <input class="input" style="max-width:70px" value="${p.count}" data-k="count" type="number" min="1">
+      <input class="input" value="${esc(p.reward)}" data-k="reward" placeholder="시상 내역">
+      <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">✕</button>
+    </div>`).join('');
+}
+function collectPrizes() {
+  return [...document.querySelectorAll('[data-p]')].map(row => ({
+    rank: row.querySelector('[data-k=rank]').value,
+    count: Number(row.querySelector('[data-k=count]').value) || 1,
+    reward: row.querySelector('[data-k=reward]').value
+  }));
+}
+document.getElementById('addPrize').addEventListener('click', () => {
+  const cur = collectPrizes(); cur.push({ rank: '', count: 1, reward: '' }); renderPrizes(cur);
+});
+document.getElementById('cForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target;
+  const body = { prizes: collectPrizes() };
+  ['title', 'subtitle', 'summary', 'target', 'status'].forEach(k => body[k] = f.elements[k].value);
+  ['start_at', 'end_at', 'judge_until', 'result_at'].forEach(k => {
+    if (f.elements[k].value) body[k] = new Date(f.elements[k].value).toISOString();
+  });
+  const { error } = await sb.from('contests').update(body).eq('id', CONTEST.id);
+  if (error) return toast('저장에 실패했습니다.', true);
+  toast('공모전 정보를 저장했습니다.');
+  CONTEST = await DB.contest();
+  renderDash();
+});
+
+/* ---------- 공지 편집 ---------- */
+function renderNoticeEdit(notice) {
+  NOTICE = JSON.parse(JSON.stringify(notice || { sections: [] }));
+  document.getElementById('noticeEdit').innerHTML = (NOTICE.sections || []).map((s, i) => `
+    <div class="card" style="margin-bottom:12px;background:var(--bg)" data-sec="${i}">
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <input class="input" data-f="title" value="${esc(s.title)}" placeholder="섹션 제목">
+        <button type="button" class="btn btn-sm btn-danger" onclick="delSec(${i})">✕</button>
+      </div>
+      <textarea class="textarea" data-f="items" placeholder="한 줄에 하나씩 입력">${(s.items || []).map(esc).join('\n')}</textarea>
+      ${s.criteria ? `<div class="mt-16"><b style="font-size:13.5px">심사 기준 (항목|배점|설명)</b>
+        <textarea class="textarea mt-8" data-f="criteria">${s.criteria.map(c => `${c.name}|${c.weight}|${c.desc}`).join('\n')}</textarea></div>` : ''}
+      ${s.downloads ? `<div class="mt-16"><b style="font-size:13.5px">다운로드 자료 (이름|경로)</b>
+        <textarea class="textarea mt-8" data-f="downloads">${s.downloads.map(d => `${d.name}|${d.file}`).join('\n')}</textarea>
+        <div class="hint">파일은 저장소에 올리고 파일명만 으로 적어주세요.</div></div>` : ''}
+    </div>`).join('');
+}
+function delSec(i) { collectNotice(); NOTICE.sections.splice(i, 1); renderNoticeEdit(NOTICE); }
+document.getElementById('addSec').addEventListener('click', () => {
+  collectNotice();
+  NOTICE.sections.push({ icon: 'info', title: '새 항목', items: [] });
+  renderNoticeEdit(NOTICE);
+});
+function collectNotice() {
+  document.querySelectorAll('[data-sec]').forEach(el => {
+    const s = NOTICE.sections[Number(el.dataset.sec)];
+    s.title = el.querySelector('[data-f=title]').value;
+    s.items = el.querySelector('[data-f=items]').value.split('\n').map(x => x.trim()).filter(Boolean);
+    const cr = el.querySelector('[data-f=criteria]');
+    if (cr) s.criteria = cr.value.split('\n').filter(Boolean).map(l => {
+      const [name, weight, desc] = l.split('|');
+      return { name: (name || '').trim(), weight: Number(weight) || 0, desc: (desc || '').trim() };
+    });
+    const dl = el.querySelector('[data-f=downloads]');
+    if (dl) s.downloads = dl.value.split('\n').filter(Boolean).map(l => {
+      const [name, file] = l.split('|');
+      return { name: (name || '').trim(), file: (file || '').trim(), size: '' };
+    });
+  });
+  return NOTICE;
+}
+document.getElementById('saveNotice').addEventListener('click', async () => {
+  const n = collectNotice();
+  n.author = '목운중학교 학생회';
+  const { error } = await sb.from('contests').update({ notice: n }).eq('id', CONTEST.id);
+  if (error) return toast('저장에 실패했습니다.', true);
+  toast('공지사항을 저장했습니다.');
+  CONTEST = await DB.contest();
+});
+
+/* ---------- FAQ ---------- */
+async function loadFaqs() {
+  const faqs = await DB.faqs();
+  document.getElementById('faqEdit').innerHTML = faqs.map(f => `
+    <div class="card" style="margin-bottom:10px;background:var(--bg)">
+      <input class="input" value="${esc(f.q)}" id="q_${f.id}" style="margin-bottom:6px">
+      <textarea class="textarea" id="a_${f.id}" style="min-height:70px">${esc(f.a)}</textarea>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn btn-sm btn-primary" onclick="saveFaq('${f.id}')">저장</button>
+        <button class="btn btn-sm btn-danger" onclick="delFaq('${f.id}')">삭제</button>
+      </div>
+    </div>`).join('');
+}
+async function saveFaq(id) {
+  const { error } = await sb.from('faqs').update({
+    q: document.getElementById('q_' + id).value, a: document.getElementById('a_' + id).value
+  }).eq('id', id);
+  toast(error ? '저장에 실패했습니다.' : '저장했습니다.', !!error);
+}
+async function delFaq(id) {
+  if (!confirm('이 질문을 삭제할까요?')) return;
+  await sb.from('faqs').delete().eq('id', id);
+  loadFaqs();
+}
+document.getElementById('addFaq').addEventListener('click', async () => {
+  await sb.from('faqs').insert({ q: '새 질문', a: '답변을 입력하세요.', sort: 99 });
+  loadFaqs();
+});
+
+/* ---------- 문의 ---------- */
+async function loadInquiries() {
+  const { data } = await sb.from('inquiries').select('*').order('created_at', { ascending: false });
+  INQ = data || [];
+  document.getElementById('inqList').innerHTML = INQ.length ? INQ.map(q => `
+    <div class="card" style="margin-bottom:10px;background:var(--bg)">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <b>${esc(q.name)} ${q.email ? `<span class="muted" style="font-weight:500">· ${esc(q.email)}</span>` : ''}</b>
+        <span class="muted" style="font-size:12.5px">${fmtDate(q.created_at, true)}</span>
+      </div>
+      <p class="mt-8" style="font-size:14.5px;white-space:pre-wrap">${esc(q.question)}</p>
+      <textarea class="textarea mt-16" id="ans_${q.id}" placeholder="답변을 입력하세요" style="min-height:70px">${esc(q.answer)}</textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <button class="btn btn-sm btn-primary" onclick="answer('${q.id}')">답변 저장</button>
+        ${q.answered_at ? `<span class="muted" style="font-size:12.5px">답변 완료 · ${fmtDate(q.answered_at, true)}</span>`
+          : '<span style="color:var(--amber);font-size:12.5px;font-weight:700">미답변</span>'}
+      </div>
+    </div>`).join('') : '<div class="empty">문의가 없습니다.</div>';
+}
+async function answer(id) {
+  const { error } = await sb.from('inquiries').update({
+    answer: document.getElementById('ans_' + id).value, answered_at: new Date().toISOString()
+  }).eq('id', id);
+  if (error) return toast('저장에 실패했습니다.', true);
+  toast('답변을 저장했습니다.');
+  await loadInquiries(); renderDash();
+}
+
+/* ---------- 드로어 ---------- */
+function openDrawer(html) {
+  document.getElementById('drawer').innerHTML = html;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('bd').classList.add('on');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('bd').classList.remove('on');
+}
+document.getElementById('bd').addEventListener('click', closeDrawer);
+
+</script>
+</body>
+</html>

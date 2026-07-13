@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="mokun-logo.svg">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>작품 제출 · 목운중 교복 디자인 공모전</title>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">홈</a> › <a href="notice.html">공지사항</a> › 작품 제출</div>
+    <h1>작품 제출</h1>
+    <p>제출 후에는 파일을 수정할 수 없습니다. 올리기 전에 한 번 더 확인해 주세요.</p>
+  </div>
+</div>
+
+<section class="section" id="blocked" style="display:none">
+  <div class="wrap" style="max-width:560px">
+    <div class="card center" id="blockCard">
+      <div style="font-size:40px;margin-bottom:10px">🔒</div>
+      <h2 style="font-size:21px;margin-bottom:8px">공지사항을 먼저 읽어주세요</h2>
+      <p class="muted mt-8">참가자는 작품을 제출하기 전에 학생회가 작성한 공지사항(주의사항 · 제출 규격 · 심사 기준 · 유의사항)을 반드시 끝까지 읽어야 합니다.</p>
+      <a href="notice.html" class="btn btn-primary btn-lg btn-block mt-24">공지사항 읽으러 가기</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="formSec" style="display:none;padding-top:32px">
+  <div class="wrap" style="max-width:760px">
+    <div class="card" style="background:var(--blue-50);border-color:var(--blue-100);margin-bottom:22px">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <span style="font-size:20px">📌</span>
+        <div style="font-size:14px;color:var(--ink-700)">
+          <b>제출 전 체크리스트</b><div class="mt-8" id="checklist"></div>
+        </div>
+      </div>
+    </div>
+
+    <form id="form" class="card">
+      <h2 style="font-size:19px;margin-bottom:4px">참가자 정보</h2>
+      <p class="muted" style="font-size:13.5px;margin-bottom:20px">심사는 블라인드로 진행되며, 아래 정보는 시상·연락 목적으로만 사용됩니다.</p>
+      <div class="grid-2">
+        <div class="field" id="f-name"><label>이름 <span class="req">*</span></label>
+          <input class="input" name="name" placeholder="홍길동" required>
+          <div class="err">이름을 입력해 주세요.</div></div>
+        <div class="field" id="f-studentId"><label>학번 <span class="req">*</span></label>
+          <input class="input" name="studentId" placeholder="20315" inputmode="numeric" required>
+          <div class="hint">학년·반·번호 순 (예: 2학년 3반 15번 → 20315)</div>
+          <div class="err">학번은 숫자 4~6자리로 입력해 주세요.</div></div>
+        <div class="field" id="f-phone"><label>연락처 <span class="req">*</span></label>
+          <input class="input" name="phone" placeholder="010-1234-5678" inputmode="tel" required>
+          <div class="err">연락처 형식을 확인해 주세요.</div></div>
+        <div class="field" id="f-email"><label>이메일 <span class="muted" style="font-weight:500">(선택)</span></label>
+          <input class="input" name="email" type="email" placeholder="student@example.com">
+          <div class="hint">학생회가 연락할 때 사용합니다.</div></div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid var(--line);margin:8px 0 24px">
+      <h2 style="font-size:19px;margin-bottom:20px">작품 정보</h2>
+      <div class="field" id="f-title"><label>작품명 <span class="req">*</span></label>
+        <input class="input" name="title" placeholder="예: 바람을 담은 목운 교복" required maxlength="40">
+        <div class="err">작품명을 입력해 주세요.</div></div>
+      <div class="field"><label>디자인 설명 <span class="muted" style="font-weight:500">(선택 · 200자 이내)</span></label>
+        <textarea class="textarea" name="concept" maxlength="200" placeholder="어떤 점을 살렸는지, 어떤 소재·색상을 썼는지 간단히 적어주세요. 팀 참가라면 팀원 이름도 함께 적어주세요."></textarea></div>
+
+      <div class="field">
+        <label>디자인 파일 <span class="req">*</span></label>
+        <div class="drop" id="drop">
+          <div class="ic">📁</div>
+          <b>파일을 끌어다 놓거나 클릭해서 선택하세요</b>
+          <small>JPG · PNG · PDF · ZIP · 파일당 최대 20MB · 최대 5개</small>
+        </div>
+        <input type="file" id="files" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,.zip" class="hide">
+        <div class="filelist" id="filelist"></div>
+      </div>
+
+      <hr style="border:0;border-top:1px solid var(--line);margin:8px 0 20px">
+      <h2 style="font-size:19px;margin-bottom:14px">필수 확인사항 <span class="req" style="color:var(--red)">*</span></h2>
+      <div id="agrees"></div>
+
+      <button type="submit" class="btn btn-primary btn-lg btn-block mt-24" id="submitBtn" disabled>작품 제출하기</button>
+      <p class="center muted mt-16" style="font-size:12.5px">제출 즉시 접수번호가 발급되며, 이후 파일 수정은 불가능합니다.</p>
+    </form>
+  </div>
+</section>
+
+<section class="section" id="doneSec" style="display:none">
+  <div class="wrap">
+    <div class="done">
+      <div class="circle">✓</div>
+      <h2>접수가 완료되었습니다!</h2>
+      <p>참가해 주셔서 감사합니다. 접수번호를 꼭 저장해 주세요.</p>
+      <div class="receipt">
+        <div class="lab">접수번호</div>
+        <div class="no" id="doneNo">-</div>
+        <div class="muted mt-8" style="font-size:13px" id="doneInfo"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-line" id="copyBtn">접수번호 복사</button>
+        <a href="lookup.html" class="btn btn-ghost">접수 내역 조회</a>
+        <a href="index.html" class="btn btn-primary">홈으로</a>
+      </div>
+      <p class="muted mt-24" style="font-size:13px">접수번호는 [접수 조회] 메뉴에서 진행 상황을 확인할 때 필요합니다. 화면을 캡처해 두세요.</p>
+    </div>
+  </div>
+</section>
+
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+
+mountLayout('submit.html');
+
+const CHECKS = [
+  '본인이 직접 만든 창작물이며, 타인의 디자인이나 저작권 있는 이미지를 사용하지 않았습니다.',
+  '작품 파일 안에 이름·학번 등 신원을 알 수 있는 정보를 넣지 않았습니다. (블라인드 심사)',
+  '동복 또는 하복 중 최소 1개 세트의 전체 착장 도식화가 포함되어 있습니다.',
+  '제출 후에는 파일을 수정할 수 없다는 점을 이해했습니다.',
+  '개인정보(이름·학번·연락처)를 공모전 진행 및 시상 목적으로 수집·이용하는 데 동의합니다.'
+];
+const CHECKLIST = [
+  '파일 형식이 JPG · PNG · PDF 인가요?',
+  '도식화(앞·뒤)와 배색안이 모두 들어 있나요?',
+  '파일이 선명하게 보이나요? (최소 1,500px 권장)',
+  '작품에 이름·학번이 적혀 있진 않나요?'
+];
+
+let contest = null, picked = [];
+
+(async function () {
+  let c = null;
+  try { c = await DB.contest(); } catch (e) {}
+  if (!c) { document.getElementById('blocked').style.display = 'block'; return; }
+  contest = c;
+
+  if (!NoticeGate.isRead(c.id)) {
+    document.getElementById('blocked').style.display = 'block';
+    return;
+  }
+  if (c.status !== 'open' || (c.end_at && new Date(c.end_at) < new Date())) {
+    document.getElementById('blocked').style.display = 'block';
+    document.getElementById('blockCard').innerHTML =
+      '<div style="font-size:40px;margin-bottom:10px">⏰</div>' +
+      '<h2 style="font-size:21px;margin-bottom:8px">지금은 접수 기간이 아닙니다</h2>' +
+      '<p class="muted">현재 상태: ' + (STATUS[c.status] || STATUS.closed).label + '</p>' +
+      '<a href="results.html" class="btn btn-primary btn-block mt-24">결과 발표 보기</a>';
+    return;
+  }
+
+  document.getElementById('formSec').style.display = 'block';
+  document.getElementById('checklist').innerHTML = CHECKLIST.map(c => `<div style="margin-top:4px">□ ${c}</div>`).join('');
+  document.getElementById('agrees').innerHTML = CHECKS.map((c, i) =>
+    `<label class="check"><input type="checkbox" class="agree" data-i="${i}"><span>${c}</span></label>`).join('');
+  document.querySelectorAll('.agree').forEach(ch => ch.addEventListener('change', e => {
+    e.target.closest('.check').classList.toggle('checked', e.target.checked);
+    syncBtn();
+  }));
+})();
+
+const drop = document.getElementById('drop'), input = document.getElementById('files');
+drop.addEventListener('click', () => input.click());
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); addFiles(e.dataTransfer.files); });
+input.addEventListener('change', e => addFiles(e.target.files));
+
+function addFiles(list) {
+  for (const f of list) {
+    if (picked.length >= 5) { toast('파일은 최대 5개까지 올릴 수 있어요.', true); break; }
+    if (f.size > 20 * 1024 * 1024) { toast(f.name + ' 은(는) 20MB를 넘습니다.', true); continue; }
+    if (picked.some(p => p.name === f.name && p.size === f.size)) continue;
+    picked.push(f);
+  }
+  renderFiles();
+}
+function renderFiles() {
+  document.getElementById('filelist').innerHTML = picked.map((f, i) => `
+    <div class="fileitem">
+      <span class="fi-ic">${(f.name.split('.').pop() || '').toUpperCase().slice(0, 4)}</span>
+      <span class="fi-name">${esc(f.name)}</span>
+      <span class="fi-size">${fmtSize(f.size)}</span>
+      <button type="button" class="fi-x" onclick="removeFile(${i})">✕</button>
+    </div>`).join('');
+  syncBtn();
+}
+function removeFile(i) { picked.splice(i, 1); renderFiles(); }
+function syncBtn() {
+  const all = [...document.querySelectorAll('.agree')].every(c => c.checked);
+  document.getElementById('submitBtn').disabled = !(all && picked.length > 0);
+}
+
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target, v = k => form.elements[k].value.trim();
+
+  let bad = false;
+  const setErr = (id, cond) => { document.getElementById(id).classList.toggle('invalid', cond); if (cond) bad = true; };
+  setErr('f-name', !v('name'));
+  setErr('f-studentId', !/^\d{4,6}$/.test(v('studentId')));
+  setErr('f-phone', !/^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(v('phone').replace(/\s/g, '')));
+  setErr('f-title', !v('title'));
+  if (bad) { toast('입력 내용을 확인해 주세요.', true); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  try {
+    const receiptNo = await DB.submit({
+      name: v('name'), studentId: v('studentId'), phone: v('phone'),
+      email: v('email'), title: v('title'), concept: v('concept')
+    }, picked, (i, n) => { btn.textContent = `업로드 중… (${i}/${n})`; });
+
+    document.getElementById('formSec').style.display = 'none';
+    document.getElementById('doneSec').style.display = 'block';
+    document.getElementById('doneNo').textContent = receiptNo;
+    document.getElementById('doneInfo').textContent =
+      `${v('name')} · ${v('title')} · 파일 ${picked.length}개 · ${fmtDate(new Date().toISOString(), true)}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    toast(err.message, true);
+    btn.disabled = false; btn.textContent = '작품 제출하기';
+  }
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const no = document.getElementById('doneNo').textContent;
+  navigator.clipboard?.writeText(no).then(() => toast('접수번호를 복사했습니다: ' + no));
+});
+
+</script>
+</body>
+</html>

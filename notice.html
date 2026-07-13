@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="mokun-logo.svg">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>공지사항 · 목운중 교복 디자인 공모전</title>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">홈</a> › 공지사항</div>
+    <h1>공모전 공지사항</h1>
+    <p>참가 전 반드시 읽어야 하는 필수 안내입니다. <b>끝까지 읽으면 참가 버튼이 열립니다.</b></p>
+    <div class="mt-16" id="noticeMeta" style="font-size:13px;color:var(--ink-400)"></div>
+  </div>
+</div>
+
+<section class="section" style="padding-top:28px">
+  <div class="wrap" style="max-width:880px">
+    <div class="readbar">
+      <div class="txt"><span>공지 읽기 진행률</span><b id="pct">0%</b></div>
+      <div class="progress"><i id="bar"></i></div>
+    </div>
+    <div class="notice-body" id="noticeBody">
+      <div class="empty"><div class="ic">📄</div>공지를 불러오는 중입니다…</div>
+    </div>
+    <div class="gate" id="gate">
+      <div class="gate-msg" id="gateMsg"><span>🔒</span><span>공지를 끝까지 스크롤하면 참가 버튼이 활성화됩니다.</span></div>
+      <label class="check" style="margin-bottom:12px">
+        <input type="checkbox" id="agreeRead" disabled>
+        <span>위 공지사항(주의사항 · 제출 규격 · 심사 기준 · 유의사항)을 모두 확인했습니다.</span>
+      </label>
+      <button class="btn btn-primary btn-lg btn-block" id="goSubmit" disabled>공모전 참가하기</button>
+    </div>
+    <p class="center muted mt-16" style="font-size:13.5px">
+      궁금한 점이 있나요? <a href="faq.html" style="color:var(--blue-600);font-weight:700">FAQ · 문의하기 →</a></p>
+  </div>
+</section>
+
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+
+mountLayout('notice.html');
+const ICONS = { alert: '⚠', file: '📄', download: '⬇', star: '★', info: 'i' };
+let contestId = null, unlocked = false;
+
+const bodyEl = document.getElementById('noticeBody');
+const bar = document.getElementById('bar'), pct = document.getElementById('pct');
+const gate = document.getElementById('gate'), gateMsg = document.getElementById('gateMsg');
+const agree = document.getElementById('agreeRead'), goBtn = document.getElementById('goSubmit');
+
+(async function () {
+  try {
+    const c = await DB.contest();
+    if (!c) { bodyEl.innerHTML = '<div class="empty">진행 중인 공모전이 없습니다.</div>'; return; }
+    contestId = c.id;
+    const n = c.notice || { sections: [] };
+    document.getElementById('noticeMeta').innerHTML =
+      statusBadge(c.status) + ' &nbsp; 작성 ' + esc(n.author || '목운중학교 학생회');
+
+    bodyEl.innerHTML = (n.sections || []).map(s => `
+      <article class="nsec">
+        <h3><span class="ic">${ICONS[s.icon] || '•'}</span>${esc(s.title)}</h3>
+        ${s.items && s.items.length ? `<ul>${s.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+        ${s.criteria ? `<table class="tbl mt-16"><tr><th>항목</th><th>배점</th><th>설명</th></tr>
+          ${s.criteria.map(x => `<tr><td><b>${esc(x.name)}</b></td><td style="color:var(--blue-600);font-weight:800">${x.weight}점</td><td class="muted">${esc(x.desc)}</td></tr>`).join('')}</table>` : ''}
+        ${s.downloads ? `<div class="dl-list">${s.downloads.map(d => `
+          <a class="dl-item" href="${esc(d.file)}" download><span class="ic">⬇</span>
+            <b>${esc(d.name)}</b><span class="go">${esc(d.size || '')} 다운로드</span></a>`).join('')}</div>` : ''}
+      </article>`).join('');
+
+    if (NoticeGate.isRead(c.id)) unlock(true);
+    checkScroll();
+  } catch (e) { bodyEl.innerHTML = '<div class="empty">공지를 불러오지 못했습니다.</div>'; }
+})();
+
+function checkScroll() {
+  const max = bodyEl.scrollHeight - bodyEl.clientHeight;
+  const p = max <= 4 ? 100 : Math.min(100, Math.round(bodyEl.scrollTop / max * 100));
+  bar.style.width = p + '%'; pct.textContent = p + '%';
+  if (p >= 98) unlock(false);
+}
+bodyEl.addEventListener('scroll', checkScroll);
+window.addEventListener('resize', checkScroll);
+
+function unlock(silent) {
+  if (unlocked) return;
+  unlocked = true;
+  bar.style.width = '100%'; pct.textContent = '100%';
+  agree.disabled = false;
+  gate.classList.add('ready');
+  gateMsg.innerHTML = '<span>✅</span><span>공지를 모두 확인했습니다. 아래 항목에 동의하면 참가할 수 있습니다.</span>';
+  if (!silent) toast('공지를 모두 읽었습니다. 이제 참가할 수 있어요!');
+}
+agree.addEventListener('change', e => {
+  e.target.closest('.check').classList.toggle('checked', e.target.checked);
+  goBtn.disabled = !e.target.checked;
+});
+goBtn.addEventListener('click', () => { NoticeGate.set(contestId); location.href = 'submit.html'; });
+
+</script>
+</body>
+</html>

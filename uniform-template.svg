@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520">
+  <style>
+    .l{fill:none;stroke:#94A3B8;stroke-width:2;stroke-linejoin:round}
+    .g{fill:none;stroke:#E6EBF3;stroke-width:1}
+    .t{font-family:'Malgun Gothic',sans-serif;font-size:14px;fill:#64748B}
+    .h{font-family:'Malgun Gothic',sans-serif;font-size:18px;font-weight:700;fill:#0F172A}
+  </style>
+  <rect width="900" height="520" fill="#fff"/>
+  <text x="30" y="36" class="h">목운중학교 교복 디자인 도식화 템플릿</text>
+  <text x="30" y="58" class="t">아래 실루엣 위에 자유롭게 디자인하세요. (앞면 / 뒷면 / 하의)</text>
+
+  <!-- 앞면 상의 -->
+  <text x="90" y="96" class="t">앞면 (상의)</text>
+  <path class="l" d="M60 120 L110 106 L140 120 L170 106 L220 120 L232 176 L206 186 L206 300 Q140 312 74 300 L74 186 L48 176 Z"/>
+  <path class="g" d="M110 106 L140 150 L170 106"/>
+  <line class="g" x1="140" y1="150" x2="140" y2="300"/>
+
+  <!-- 뒷면 상의 -->
+  <text x="330" y="96" class="t">뒷면 (상의)</text>
+  <path class="l" d="M300 120 L350 106 L410 106 L460 120 L472 176 L446 186 L446 300 Q380 312 314 300 L314 186 L288 176 Z"/>
+  <path class="g" d="M350 106 Q380 122 410 106"/>
+
+  <!-- 하의 -->
+  <text x="600" y="96" class="t">하의 (바지 / 치마)</text>
+  <path class="l" d="M560 120 H700 L710 180 L700 320 H646 L630 200 L614 320 H560 L550 180 Z"/>
+  <line class="g" x1="630" y1="120" x2="630" y2="200"/>
+  <path class="l" d="M760 120 H860 L880 260 Q820 276 740 260 Z"/>
+  <text x="784" y="290" class="t">치마</text>
+
+  <!-- 배색 팔레트 -->
+  <text x="30" y="378" class="h">배색안 (색상을 채워 넣으세요)</text>
+  <g>
+    <rect x="30" y="396" width="90" height="60" rx="8" class="l"/><text x="34" y="474" class="t">메인 컬러</text>
+    <rect x="140" y="396" width="90" height="60" rx="8" class="l"/><text x="144" y="474" class="t">서브 컬러</text>
+    <rect x="250" y="396" width="90" height="60" rx="8" class="l"/><text x="254" y="474" class="t">포인트</text>
+    <rect x="360" y="396" width="90" height="60" rx="8" class="l"/><text x="364" y="474" class="t">셔츠/블라우스</text>
+    <rect x="470" y="396" width="90" height="60" rx="8" class="l"/><text x="474" y="474" class="t">넥타이/리본</text>
+  </g>
+  <rect x="600" y="396" width="270" height="80" rx="8" class="l"/>
+  <text x="612" y="418" class="t">디자인 설명 (200자 이내)</text>
+</svg>

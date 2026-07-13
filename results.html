@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="mokun-logo.svg">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>결과 발표 · 목운중 교복 디자인 공모전</title>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">홈</a> › 결과 발표</div>
+    <h1>결과 발표 · 수상작 갤러리</h1>
+    <p>심사가 끝나면 이곳에서 수상작을 공개합니다.</p>
+  </div>
+</div>
+<section class="section" style="padding-top:32px">
+  <div class="wrap">
+    <div id="state"></div>
+    <div id="list"></div>
+  </div>
+</section>
+<div id="lb" class="hide" style="position:fixed;inset:0;background:rgba(15,23,42,.86);z-index:300;display:grid;place-items:center;padding:24px" onclick="this.classList.add('hide')">
+  <img id="lbImg" style="max-width:92vw;max-height:88vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+</div>
+
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+
+mountLayout('results.html');
+
+(async function () {
+  const state = document.getElementById('state'), list = document.getElementById('list');
+  let c = null, results = [];
+  try { c = await DB.contest(); results = await DB.winners(); } catch (e) {}
+
+  if (c) state.innerHTML = `
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:24px">
+      <div><b style="font-size:16px">${esc(c.title)}</b>
+        <div class="muted" style="font-size:13.5px">결과 발표 예정일 · ${fmtDate(c.result_at)}</div></div>
+      ${statusBadge(c.status)}
+    </div>`;
+
+  if (!results.length) {
+    list.innerHTML = `<div class="empty">
+      <div class="ic">🏆</div>
+      <b style="display:block;color:var(--ink-700);font-size:17px;margin-bottom:6px">아직 발표된 수상작이 없습니다</b>
+      심사가 끝나면 이 페이지에서 수상작을 공개합니다.<br>
+      <a href="notice.html" class="btn btn-primary mt-24">공모전 참가하기</a></div>`;
+    return;
+  }
+
+  list.innerHTML = results.map(r => `
+    <section style="margin-bottom:44px">
+      <div class="section-head" style="text-align:left;margin-bottom:20px">
+        <div class="eyebrow">RESULT · ${fmtDate(r.result_at)}</div>
+        <h2 style="font-size:24px">${esc(r.contest_title)} 수상작</h2>
+      </div>
+      <div class="gallery">
+        ${(r.winners || []).map(w => {
+          const gold = (w.award.rank || '').includes('대상');
+          const url = w.award.image ? DB.winnerImageUrl(w.award.image) : '';
+          return `
+          <article class="gcard ${gold ? 'gold' : ''}">
+            <div class="thumb">
+              ${url ? `<img src="${url}" alt="${esc(w.title)}" loading="lazy" style="cursor:zoom-in" onclick="openLb(this.src)">`
+                    : '<span style="font-size:34px">👕</span>'}
+            </div>
+            <div class="body">
+              <span class="rank">🏆 ${esc(w.award.rank)}</span>
+              <h3>${esc(w.title)}</h3>
+              <p>${esc(w.name)} 학생</p>
+              ${w.concept ? `<p class="mt-8" style="color:var(--ink-500)">${esc(w.concept)}</p>` : ''}
+            </div>
+          </article>`;
+        }).join('')}
+      </div>
+    </section>`).join('');
+})();
+
+function openLb(src) {
+  document.getElementById('lbImg').src = src;
+  document.getElementById('lb').classList.remove('hide');
+}
+
+</script>
+</body>
+</html>

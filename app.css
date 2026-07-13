@@ -1,0 +1,279 @@
+/* ===== 목운중학교 교복 디자인 공모전 · 공통 디자인 시스템 ===== */
+:root{
+  --blue-900:#0b2a6b; --blue-700:#123a99; --blue-600:#1b4fd8; --blue-500:#2f6bf0;
+  --blue-100:#dce7ff; --blue-50:#f0f5ff;
+  --ink-900:#0f172a; --ink-700:#334155; --ink-500:#64748b; --ink-400:#94a3b8;
+  --line:#e6ebf3; --bg:#f7f9fc; --white:#fff;
+  --green:#0ea36b; --amber:#d97706; --red:#dc2626;
+  --r-sm:8px; --r:12px; --r-lg:18px;
+  --sh-1:0 1px 2px rgba(15,23,42,.06);
+  --sh-2:0 4px 16px rgba(15,23,42,.08);
+  --sh-3:0 12px 40px rgba(11,42,107,.14);
+  --max:1160px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',-apple-system,sans-serif;
+  color:var(--ink-900); background:var(--white); line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button,input,textarea,select{font-family:inherit;font-size:inherit}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+
+/* ---------- 헤더 ---------- */
+.header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.header .wrap{display:flex;align-items:center;justify-content:space-between;height:66px;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.4px}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue-600),var(--blue-900));color:#fff;display:grid;place-items:center;font-size:14px;font-weight:800}
+.logo small{display:block;font-size:11px;color:var(--ink-500);font-weight:600;letter-spacing:0}
+.nav{display:flex;align-items:center;gap:4px}
+.nav a{padding:9px 13px;border-radius:8px;font-size:15px;font-weight:600;color:var(--ink-700);white-space:nowrap}
+.nav a:hover{background:var(--blue-50);color:var(--blue-700)}
+.nav a.active{color:var(--blue-700);background:var(--blue-50)}
+.nav .btn{margin-left:8px}
+.burger{display:none;width:42px;height:42px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;font-size:18px}
+
+/* ---------- 버튼 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;border:1px solid transparent;font-weight:700;font-size:15px;cursor:pointer;transition:.18s;white-space:nowrap}
+.btn-primary{background:var(--blue-600);color:#fff;box-shadow:0 4px 14px rgba(27,79,216,.28)}
+.btn-primary:hover{background:var(--blue-700);transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--blue-700);border-color:var(--blue-100)}
+.btn-ghost:hover{background:var(--blue-50)}
+.btn-line{background:#fff;border-color:var(--line);color:var(--ink-700)}
+.btn-line:hover{border-color:var(--ink-400)}
+.btn-danger{background:#fff;color:var(--red);border-color:#fecaca}
+.btn-danger:hover{background:#fef2f2}
+.btn-lg{padding:16px 30px;font-size:17px;border-radius:12px}
+.btn-sm{padding:7px 12px;font-size:13px;border-radius:8px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ---------- 뱃지 ---------- */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.badge-open{background:#e7f7f0;color:var(--green)}
+.badge-judging{background:#fef3e2;color:var(--amber)}
+.badge-announced{background:var(--blue-50);color:var(--blue-700)}
+.badge-closed{background:#f1f5f9;color:var(--ink-500)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge-open .dot{animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ---------- 히어로 ---------- */
+.hero{position:relative;background:linear-gradient(160deg,var(--blue-900) 0%,var(--blue-700) 45%,var(--blue-600) 100%);color:#fff;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:
+  radial-gradient(600px 300px at 85% 15%,rgba(255,255,255,.14),transparent 60%),
+  radial-gradient(500px 260px at 10% 90%,rgba(255,255,255,.08),transparent 60%);pointer-events:none}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;padding-top:64px;padding-bottom:64px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:700;margin-bottom:18px}
+.hero h1{font-size:clamp(28px,4vw,44px);line-height:1.25;letter-spacing:-1px;font-weight:800;margin-bottom:14px}
+.hero p.lead{font-size:17px;color:#cfe0ff;max-width:540px;margin-bottom:26px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.hero-actions .btn-primary{background:#fff;color:var(--blue-700);box-shadow:0 6px 22px rgba(0,0,0,.18)}
+.hero-actions .btn-primary:hover{background:#f4f7ff}
+.hero-actions .btn-ghost{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)}
+.hero-actions .btn-ghost:hover{background:rgba(255,255,255,.18)}
+.hero-meta{display:flex;gap:26px;flex-wrap:wrap;font-size:14px;color:#bcd0f7}
+.hero-meta b{display:block;color:#fff;font-size:15px;margin-top:2px}
+
+/* D-Day 카드 */
+.dday-card{background:rgba(255,255,255,.98);border-radius:var(--r-lg);padding:26px;color:var(--ink-900);box-shadow:var(--sh-3)}
+.dday-card .label{font-size:13px;color:var(--ink-500);font-weight:700;text-align:center}
+.dday-big{text-align:center;font-size:46px;font-weight:800;letter-spacing:-2px;color:var(--blue-600);margin:2px 0 14px}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.cd-cell{background:var(--blue-50);border-radius:10px;padding:10px 4px;text-align:center}
+.cd-cell b{display:block;font-size:20px;font-weight:800;color:var(--blue-700);font-variant-numeric:tabular-nums}
+.cd-cell span{font-size:11px;color:var(--ink-500);font-weight:600}
+.dday-info{border-top:1px solid var(--line);padding-top:14px;font-size:13px;color:var(--ink-500);display:grid;gap:7px}
+.dday-info div{display:flex;justify-content:space-between}
+.dday-info b{color:var(--ink-900);font-weight:700}
+
+/* ---------- 진행 단계 ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh-1)}
+.step{padding:18px 16px;text-align:center;position:relative;border-right:1px solid var(--line)}
+.step:last-child{border-right:0}
+.step .n{width:26px;height:26px;border-radius:50%;background:#eef2f7;color:var(--ink-400);display:grid;place-items:center;font-size:13px;font-weight:800;margin:0 auto 8px}
+.step .t{font-size:14px;font-weight:700;color:var(--ink-400)}
+.step .d{font-size:12px;color:var(--ink-400);margin-top:2px}
+.step.done .n{background:var(--blue-100);color:var(--blue-700)}
+.step.done .t{color:var(--ink-700)}
+.step.current{background:var(--blue-50)}
+.step.current .n{background:var(--blue-600);color:#fff}
+.step.current .t{color:var(--blue-700)}
+.step.current .d{color:var(--blue-600)}
+
+/* ---------- 섹션 공통 ---------- */
+.section{padding:64px 0}
+.section.alt{background:var(--bg)}
+.section-head{text-align:center;margin-bottom:36px}
+.section-head .eyebrow{color:var(--blue-600);font-weight:800;font-size:13px;letter-spacing:1px;text-transform:uppercase}
+.section-head h2{font-size:clamp(23px,3vw,32px);font-weight:800;letter-spacing:-.8px;margin:6px 0 8px}
+.section-head p{color:var(--ink-500);font-size:15px}
+.page-head{background:var(--bg);border-bottom:1px solid var(--line);padding:38px 0 34px}
+.page-head h1{font-size:clamp(24px,3.4vw,34px);font-weight:800;letter-spacing:-.8px}
+.page-head p{color:var(--ink-500);margin-top:6px}
+.crumb{font-size:13px;color:var(--ink-400);margin-bottom:10px}
+.crumb a:hover{color:var(--blue-600)}
+
+/* ---------- 카드 ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--sh-1)}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.feature{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:26px;transition:.2s}
+.feature:hover{box-shadow:var(--sh-2);transform:translateY(-2px);border-color:var(--blue-100)}
+.feature .ic{width:44px;height:44px;border-radius:12px;background:var(--blue-50);color:var(--blue-600);display:grid;place-items:center;margin-bottom:14px}
+.feature h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.feature p{color:var(--ink-500);font-size:14px}
+
+/* 상금 */
+.prize{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.prize .rank{min-width:82px;text-align:center;padding:7px 0;border-radius:8px;font-weight:800;font-size:14px;background:var(--blue-50);color:var(--blue-700)}
+.prize:first-child .rank{background:linear-gradient(135deg,#f5c451,#e0a326);color:#fff}
+.prize .r{font-size:14px;color:var(--ink-700)}
+.prize .c{margin-left:auto;font-size:13px;color:var(--ink-400);white-space:nowrap}
+
+/* 알림 배너 */
+.notice-strip{background:var(--blue-900);color:#dbe7ff;font-size:14px}
+.notice-strip .wrap{display:flex;align-items:center;gap:12px;padding:11px 20px;flex-wrap:wrap}
+.notice-strip .tag{background:var(--blue-500);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px}
+.notice-strip a{margin-left:auto;font-weight:700;color:#fff;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- 폼 ---------- */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:14px;font-weight:700;margin-bottom:7px}
+.field label .req{color:var(--red);margin-left:3px}
+.field .hint{font-size:12.5px;color:var(--ink-400);margin-top:6px}
+.input,.textarea,select.input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;transition:.15s;font-size:15px}
+.input:focus,.textarea:focus{outline:none;border-color:var(--blue-500);box-shadow:0 0 0 3px rgba(47,107,240,.12)}
+.textarea{min-height:110px;resize:vertical}
+.err{color:var(--red);font-size:13px;margin-top:6px;display:none}
+.field.invalid .input{border-color:var(--red)}
+.field.invalid .err{display:block}
+
+.check{display:flex;gap:10px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:.15s;margin-bottom:8px;background:#fff}
+.check:hover{border-color:var(--blue-100);background:var(--blue-50)}
+.check input{margin-top:3px;width:17px;height:17px;accent-color:var(--blue-600);flex:none}
+.check span{font-size:14px;color:var(--ink-700)}
+.check.checked{border-color:var(--blue-500);background:var(--blue-50)}
+
+/* 업로드 */
+.drop{border:2px dashed var(--blue-100);border-radius:var(--r);padding:36px 20px;text-align:center;background:var(--blue-50);cursor:pointer;transition:.18s}
+.drop:hover,.drop.over{border-color:var(--blue-500);background:#e8f0ff}
+.drop .ic{font-size:30px;margin-bottom:8px}
+.drop b{display:block;font-weight:700;margin-bottom:4px}
+.drop small{color:var(--ink-500)}
+.filelist{margin-top:12px;display:grid;gap:8px}
+.fileitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff}
+.fileitem .fi-ic{width:32px;height:32px;border-radius:7px;background:var(--blue-50);color:var(--blue-600);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.fileitem .fi-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fileitem .fi-size{color:var(--ink-400);font-size:12.5px;flex:none}
+.fileitem .fi-x{border:0;background:none;color:var(--ink-400);cursor:pointer;font-size:17px;padding:0 4px}
+.fileitem .fi-x:hover{color:var(--red)}
+
+/* ---------- 공지 게이트 ---------- */
+.notice-body{max-height:520px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r);padding:8px 26px 26px;background:#fff;scroll-behavior:smooth}
+.notice-body::-webkit-scrollbar{width:9px}
+.notice-body::-webkit-scrollbar-thumb{background:#d6dfec;border-radius:9px}
+.nsec{padding:24px 0;border-bottom:1px dashed var(--line)}
+.nsec:last-child{border-bottom:0}
+.nsec h3{font-size:18px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.nsec h3 .ic{width:28px;height:28px;border-radius:8px;background:var(--blue-50);color:var(--blue-600);display:grid;place-items:center;font-size:14px;flex:none}
+.nsec ul{list-style:none;display:grid;gap:9px}
+.nsec ul li{position:relative;padding-left:19px;font-size:15px;color:var(--ink-700)}
+.nsec ul li::before{content:'';position:absolute;left:5px;top:10px;width:5px;height:5px;border-radius:50%;background:var(--blue-500)}
+.readbar{position:sticky;top:0;z-index:2;background:#fff;padding:14px 0 12px;border-bottom:1px solid var(--line);margin-bottom:0}
+.progress{height:7px;border-radius:99px;background:#eef2f7;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue-500),var(--blue-700));transition:width .15s}
+.readbar .txt{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--ink-500);margin-bottom:7px}
+.readbar .txt b{color:var(--blue-600)}
+.gate{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:16px 0;margin-top:20px;z-index:3}
+.gate-msg{font-size:13.5px;color:var(--ink-500);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.gate.ready .gate-msg{color:var(--green);font-weight:700}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
+table.tbl th{background:var(--bg);text-align:left;padding:11px 14px;font-weight:700;color:var(--ink-700);border-bottom:1px solid var(--line);font-size:13.5px;white-space:nowrap}
+table.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);color:var(--ink-700)}
+table.tbl tr:last-child td{border-bottom:0}
+.dl-list{display:grid;gap:9px;margin-top:12px}
+.dl-item{display:flex;align-items:center;gap:11px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;transition:.15s;background:#fff}
+.dl-item:hover{border-color:var(--blue-500);background:var(--blue-50)}
+.dl-item .ic{width:34px;height:34px;border-radius:8px;background:var(--blue-50);color:var(--blue-600);display:grid;place-items:center;flex:none}
+.dl-item b{font-size:14.5px;font-weight:600;flex:1}
+.dl-item .go{color:var(--blue-600);font-size:13px;font-weight:700}
+
+/* ---------- FAQ ---------- */
+.faq-item{border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;background:#fff;overflow:hidden}
+.faq-q{width:100%;text-align:left;padding:17px 20px;background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:12px;font-weight:700;font-size:15.5px}
+.faq-q .q{width:24px;height:24px;border-radius:6px;background:var(--blue-50);color:var(--blue-600);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.faq-q .arrow{margin-left:auto;color:var(--ink-400);transition:.2s;flex:none}
+.faq-item.open .faq-q .arrow{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;color:var(--ink-500);font-size:14.5px}
+.faq-item.open .faq-a{max-height:400px}
+.faq-a div{padding:0 20px 18px 56px}
+
+/* ---------- 갤러리 ---------- */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.gcard{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:.2s}
+.gcard:hover{box-shadow:var(--sh-2);transform:translateY(-3px)}
+.gcard .thumb{aspect-ratio:4/3;background:var(--blue-50);display:grid;place-items:center;overflow:hidden}
+.gcard .thumb img{width:100%;height:100%;object-fit:cover}
+.gcard .body{padding:16px 18px}
+.gcard .rank{display:inline-block;font-size:12px;font-weight:800;padding:4px 10px;border-radius:6px;background:var(--blue-50);color:var(--blue-700);margin-bottom:8px}
+.gcard.gold .rank{background:linear-gradient(135deg,#f5c451,#e0a326);color:#fff}
+.gcard h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.gcard p{font-size:13.5px;color:var(--ink-500)}
+
+/* ---------- 완료 화면 ---------- */
+.done{text-align:center;max-width:520px;margin:0 auto;padding:44px 0}
+.done .circle{width:76px;height:76px;border-radius:50%;background:#e7f7f0;color:var(--green);display:grid;place-items:center;margin:0 auto 20px;font-size:34px;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+.done h2{font-size:26px;font-weight:800;margin-bottom:8px}
+.done p{color:var(--ink-500);margin-bottom:24px}
+.receipt{background:var(--blue-50);border:1px dashed var(--blue-100);border-radius:var(--r);padding:22px;margin-bottom:22px}
+.receipt .no{font-size:30px;font-weight:800;color:var(--blue-700);letter-spacing:1px;font-variant-numeric:tabular-nums}
+.receipt .lab{font-size:13px;color:var(--ink-500);font-weight:700}
+
+/* ---------- 토스트 ---------- */
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink-900);color:#fff;padding:13px 22px;border-radius:10px;font-size:14.5px;font-weight:600;box-shadow:var(--sh-3);opacity:0;pointer-events:none;transition:.25s;z-index:200;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.err{background:var(--red)}
+
+/* ---------- 푸터 ---------- */
+.footer{background:var(--ink-900);color:#94a3b8;padding:40px 0;font-size:13.5px;margin-top:0}
+.footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.footer b{color:#fff;display:block;margin-bottom:6px;font-size:15px}
+.footer a:hover{color:#fff}
+.footer .fnav{display:flex;gap:16px;flex-wrap:wrap}
+
+.empty{text-align:center;padding:56px 20px;color:var(--ink-400)}
+.empty .ic{font-size:38px;margin-bottom:10px;opacity:.5}
+.muted{color:var(--ink-500)}
+.center{text-align:center}
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mt-24{margin-top:24px}.mt-32{margin-top:32px}
+.hide{display:none!important}
+
+/* ---------- 반응형 ---------- */
+@media(max-width:960px){
+  .hero .wrap{grid-template-columns:1fr;gap:32px;padding-top:44px;padding-bottom:44px}
+  .grid-3,.gallery{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .step:nth-child(2){border-right:0}
+  .step:nth-child(-n+2){border-bottom:1px solid var(--line)}
+}
+@media(max-width:720px){
+  .burger{display:block}
+  .nav{position:absolute;top:66px;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;padding:10px;gap:2px;box-shadow:var(--sh-2);display:none}
+  .nav.open{display:flex}
+  .nav a{padding:13px}
+  .nav .btn{margin:6px 0 0}
+  .grid-3,.grid-2,.gallery{grid-template-columns:1fr}
+  .section{padding:44px 0}
+  .hero-meta{gap:18px}
+  .notice-body{max-height:60vh;padding:8px 16px 16px}
+  .card{padding:18px}
+  .footer .wrap{flex-direction:column}
+  table.tbl{font-size:13.5px}
+  table.tbl th,table.tbl td{padding:9px 10px}
+}

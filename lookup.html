@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="mokun-logo.svg">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>접수 조회 · 목운중 교복 디자인 공모전</title>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">홈</a> › 접수 조회</div>
+    <h1>접수 조회</h1>
+    <p>제출할 때 받은 접수번호와 이름으로 진행 상황을 확인할 수 있습니다.</p>
+  </div>
+</div>
+<section class="section" style="padding-top:32px">
+  <div class="wrap" style="max-width:540px">
+    <form class="card" id="form">
+      <div class="field"><label>접수번호 <span class="req">*</span></label>
+        <input class="input" name="receiptNo" placeholder="MK2026-0001" required></div>
+      <div class="field"><label>이름 <span class="req">*</span></label>
+        <input class="input" name="name" placeholder="홍길동" required></div>
+      <button class="btn btn-primary btn-block btn-lg">조회하기</button>
+    </form>
+    <div id="result" class="mt-24"></div>
+  </div>
+</section>
+
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+
+mountLayout('lookup.html');
+
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, box = document.getElementById('result');
+  try {
+    const s = await DB.lookup(f.receiptNo.value, f.name.value);
+    box.innerHTML = `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div><div class="muted" style="font-size:12.5px;font-weight:700">접수번호</div>
+            <div style="font-size:22px;font-weight:800;color:var(--blue-700)">${esc(s.receipt_no)}</div></div>
+          ${statusBadge(s.contest_status)}
+        </div>
+        <table class="tbl">
+          <tr><th style="width:96px">공모전</th><td>${esc(s.contest_title)}</td></tr>
+          <tr><th>참가자</th><td>${esc(s.name)}</td></tr>
+          <tr><th>작품명</th><td>${esc(s.title)}</td></tr>
+          <tr><th>제출 파일</th><td>${(s.files || []).map(f => esc(f.name)).join('<br>')}</td></tr>
+          <tr><th>접수 일시</th><td>${fmtDate(s.created_at, true)}</td></tr>
+          <tr><th>진행 상태</th><td><b style="color:var(--blue-600)">${SUB_STATUS[s.status] || s.status}</b>${s.award ? ' · 🏆 ' + esc(s.award.rank) : ''}</td></tr>
+        </table>
+      </div>`;
+  } catch (err) {
+    box.innerHTML = `<div class="card center" style="color:var(--red)">${esc(err.message)}</div>`;
+  }
+});
+
+</script>
+</body>
+</html>
