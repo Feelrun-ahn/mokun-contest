@@ -89,7 +89,7 @@
   <div class="wrap">
     <div class="section-head"><div class="eyebrow">PRIZE</div><h2>시상 내역</h2>
       <p>수상자에게는 상장과 함께 시상 내역이 수여됩니다.</p></div>
-    <div style="display:grid;gap:10px;max-width:820px;margin:0 auto" id="prizes"></div>
+    <div class="prizes" id="prizes"></div>
   </div>
 </section>
 
@@ -153,13 +153,15 @@ document.getElementById('howto').innerHTML = HOWTO.map(([t, d], i) => `
     ];
     const cur = Math.max(0, order.indexOf(c.status));
     document.getElementById('steps').innerHTML = steps.map(([t, d], i) => `
-      <div class="step ${i < cur ? 'done' : ''} ${i === cur ? 'current' : ''}">
+       <div class="step ${i < cur ? 'done' : ''} ${i === cur ? 'current' : ''}">
         <div class="n">${i < cur ? '✓' : i + 1}</div><div class="t">${t}</div><div class="d">${d}</div>
       </div>`).join('');
 
-    document.getElementById('prizes').innerHTML = (c.prizes || []).map(p => `
-      <div class="prize"><div class="rank">${esc(p.rank)}</div>
-        <div class="r">${esc(p.reward)}</div><div class="c">${p.count}팀</div></div>`).join('');
+    const prizeList = c.prizes || [];
+    document.getElementById('prizes').innerHTML = prizeList.map((p, i) => `
+       <div class="prize ${prizeList.length === 1 ? 'solo' : ''}">
+    <div class="rank">${i === 0 ? '🏆 ' : ''}${esc(p.rank)}</div>
+    <div class="r">${esc(p.reward)}</div><div class="c">${p.count}팀</div></div>`).join('');
 
     const crit = ((c.notice && c.notice.sections) || []).find(s => s.criteria);
     if (crit) document.getElementById('criteriaTbl').innerHTML =
